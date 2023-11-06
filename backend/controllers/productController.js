@@ -6,7 +6,7 @@ const apiFeatures = require("../utils/apiFeatures");
 
 exports.createProduct = async (req,res)=>{
     try{
-       
+       req.body.user = req.user.id;
        const product = await Product.create(req.body);
        return res.status(201).json({
           success:true,
@@ -170,6 +170,38 @@ exports.search= async (req,res)=>{
         return res.status(500).json({
             success:false,
             message:"Something went wrong while searching"
+        })
+    }
+}
+
+
+exports.price= async (req,res)=>{
+    try{
+         const minPrice = parserFloat(req.query.minPrice);
+         const maxPrice= parserFloat(req.query.maxPrice);
+
+
+         if(isNaN(minPrice) || isNaN(maxPrice)){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid price range"
+            })
+         }
+
+         const filterProducts = await Product.find({
+            price :{$gte :minPrice, $lte: maxPrice},
+         })
+
+
+         return res.status(200).json({
+            success:true,
+            message:'Price filter successfull',
+            filterProducts
+         })
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while filter on price"
         })
     }
 }

@@ -8,11 +8,13 @@ getProduct,
 search} = require("../controllers/productController");
 
 const router = express.Router();
+const {auth,
+isAdmin} =  require("../middleware/auth");
 
-router.post("/create-products",createProduct);
+router.post("/create-products",auth,isAdmin,createProduct);
 router.get("/getall-products",getAllProducts);
-router.put("/product/:id",updateProduct);
-router.delete("/product/:id",deleteProduct);
+router.put("/product/:id",auth,isAdmin,updateProduct);
+router.delete("/product/:id",auth,isAdmin,deleteProduct);
 router.get("/product/:id",getProduct);
 router.get("/product",search);
 

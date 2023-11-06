@@ -2,6 +2,7 @@ const express = require("express");
 const app= express();
 
 const product= require("./routes/productRoute");
+const user = require("./routes/userRoute");
 
 
 const cookieParser = require("cookie-parser");
@@ -23,6 +24,7 @@ app.use(
 	})
 )
 app.use("/api/v1/",product);
+app.use("/api/v1",user);
 
 app.get('/',(req,res)=>{
     return res.json({
