@@ -146,3 +146,138 @@ exports.logout = async (req,res)=>{
         })
     }
 }
+
+exports.getUSerDetails = async(req,res)=>{
+    try{
+
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success:true,
+        message:"User details fetch easily",
+        user
+    })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while fetch user details"
+        })
+    }
+}
+
+exports.updateProfile = async(req,res)=>{
+    try{
+
+        const newUser ={
+            name:req.body.name,
+            email:req.body.email
+        }
+
+        const user = await User.findByIdAndUpdate(req.user.id,newUser,{new:true});
+
+        return res.status(200).json({
+            success:true,
+            message:"User Profile updated successfully",
+            user
+        })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while update profile"
+        })
+    }
+}
+
+
+exports.getAllUser =  async(req,res)=>{
+    try{
+
+        const allUser = await User.find();
+
+        return res.status(200).json({
+            success:true,
+            message:"Alluser fetch successfully",
+            allUser
+        })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while fetching allUser details"
+        })
+    }
+}
+
+
+exports.getAllUserDetails= async (req,res)=>{
+    try{
+      
+      const user = await User.findById(req.params.id);
+
+      if(!user){
+        return res.status(400).json({
+            success:false,
+            message:"User details doesnot found for this id"
+        })
+      }
+
+      return res.status(200).json({
+        success:true,
+        message:"User details fetch easily",
+        user
+      })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while fetch all user details"
+        })
+    }
+}
+
+
+exports.updateRole = async(req,res)=>{
+    try{
+
+        const newUser ={
+            name:req.body.name,
+            email:req.body.email,
+            role:req.body.role
+        }
+
+        const user = await User.findByIdAndUpdate(req.params.id,newUser,{new:true});
+
+        return res.status(200).json({
+            success:true,
+            message:"User Profile updated successfully",
+            user
+        })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while update profile"
+        })
+    }
+}
+
+
+exports.deleteUser = async (req,res)=>{
+    try{
+       
+        const user = await User.findByIdAndDelete(req.params.id);
+
+        return res.status(200).json({
+            success:true,
+            message:"User deleted successfully"
+        })
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message:"Something went wrong while delete User"
+        })
+    }
+}
