@@ -3,6 +3,15 @@ class apiFeatures{
         this.query=query;
         this.queryStr=queryStr;
     }
+
+    search(){
+        const str=this.queryStr;
+        if(str){
+            name:{
+                $regex:this.queryStr
+            }
+        }
+    }
 }
 
 
