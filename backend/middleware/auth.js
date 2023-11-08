@@ -53,7 +53,7 @@ exports.isUser = async (req, res, next) => {
 exports.isAdmin = async (req, res, next) => {
 	try {
 		const userDetails = await User.findOne({ email: req.user.email });
-
+        console.log(userDetails);
 		if (userDetails.role !== "Admin") {
 			return res.status(401).json({
 				success: false,

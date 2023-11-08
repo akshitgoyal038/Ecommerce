@@ -1,14 +1,14 @@
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt")
 
 
 exports.registerUser = async(req,res)=>{
     try{
 
         const {name,email,password} = req.body;
-
-
         const existingUser = await User.findOne({ email })
+        console.log(existingUser);
         if (existingUser) {
           return res.status(400).json({
             success: false,
@@ -19,7 +19,8 @@ exports.registerUser = async(req,res)=>{
         const hashpassword = await bcrypt.hash(password,10);
 
         const user= await User.create({
-            name,email,hashpassword,
+            name,email,
+            password:hashpassword,
             avatar:{
                 public_id:"this is sample_id",
                 url:"profileUrl"
@@ -34,6 +35,7 @@ exports.registerUser = async(req,res)=>{
     }catch(error){
          return res.status(500).json({
             success:false,
+            error,
             message:"Something went wrong while creating user"
          })
     }
@@ -57,6 +59,8 @@ exports.login = async (req, res) => {
           message: `User is not Registered with Us Please SignUp to Continue`,
         })
       }
+      console.log(typeof(password));
+      console.log(user);
       if (await bcrypt.compare(password, user.password)) {
         const token = jwt.sign(
           { email: user.email, id: user._id, role: user.role },
@@ -71,7 +75,7 @@ exports.login = async (req, res) => {
           expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
           httpOnly: true,
         }
-        res.cookie("token1", token, options).status(200).json({
+        res.cookie("token", token, options).status(200).json({
           success: true,
           token,
           user,
@@ -95,8 +99,11 @@ exports.login = async (req, res) => {
 
   exports.changePassword = async (req, res) => {
     try {
-      const userDetails = await User.findById(req.user.id)
+      const userDetails = await User.findById(req.user.id);
+      console.log(userDetails);
       const { oldPassword, newPassword } = req.body
+      console.log(oldPassword);
+      console.log(newPassword);
       const isPasswordMatch = await bcrypt.compare(
         oldPassword,
         userDetails.password
@@ -106,7 +113,6 @@ exports.login = async (req, res) => {
           .status(401)
           .json({ success: false, message: "The password is incorrect" })
       }
-
       const encryptedPassword = await bcrypt.hash(newPassword, 10)
       const updatedUserDetails = await User.findByIdAndUpdate(
         req.user.id,
@@ -158,6 +164,8 @@ exports.getUSerDetails = async(req,res)=>{
         user
     })
 
+    console.log(user);
+
     }catch(error){
         return res.status(500).json({
             success:false,
@@ -173,8 +181,11 @@ exports.updateProfile = async(req,res)=>{
             name:req.body.name,
             email:req.body.email
         }
-
-        const user = await User.findByIdAndUpdate(req.user.id,newUser,{new:true});
+        console.log(newUser);
+        console.log(req.user.id);
+        const user = await User.findById(req.user.id);
+        user.name=req.body.name;
+        user.email=req.body.email
 
         return res.status(200).json({
             success:true,

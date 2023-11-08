@@ -205,3 +205,44 @@ exports.price= async (req,res)=>{
         })
     }
 }
+
+
+exports.createProductReview= async(req,res)=>{
+    try{
+      const {rating,comment,productid}= req.body;
+      const review={
+        user:req.user._id,
+        name:req.user.name,
+        rating:Number(rating),
+        comment
+      }
+  
+      const product  = await Product.findById(productid);
+      
+      const isReviewed = product.reviews.find(rev=>rev.user.toString()=== req.user._id.toString)
+      if(isReviewed){
+        product.reviews.forEach(rev => {
+            if(rev.user.toString === req.user._id.toString)
+            rev.rating=rating,
+            rev.comment=comment 
+        });
+      }else{
+         product.reviews.push(review);
+         product.numofReviews =  product.reviews.length
+      }
+      let avg=0;
+      product.ratings = product.reviews.forEach(rev=>{
+         avg=avg+rev.rating
+      })/product.reviews.length;
+
+
+      await product
+  
+    }catch(error){
+      return res.status(500).json({
+        success:false,
+        message:"Something went wrong while crating the reviews"
+      })
+    }
+  }
+  
